@@ -24,13 +24,17 @@ class FileTransfer:
         self.active = True
 
     def __init__(self):
-        self.ip = socket.gethostname()[0]
+        self.ip = "192.168.0.9"
+        print(self.ip)
         self.port = 5050
         self.dir = "./RECIVE/"
         self.makeReciveFolder()
         self.gs = Gestor()
         self.buffSize = 32768
         self.active = True
+        th = threading.Thread(target=self.waitPetitions , args=())
+        th.setDaemon(True)
+        th.start()
 
 
     def addServer(self, ip):
@@ -51,7 +55,7 @@ class FileTransfer:
         except OSError as e:
             return False
 
-    def sendMessage(ip , MSG):
+    def sendMessage(self, ip , MSG):
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
             s.sendto(MSG.encode('utf-8') , (ip,self.port))
 
