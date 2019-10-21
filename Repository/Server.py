@@ -111,7 +111,7 @@ class FileTransfer:
 
     def deleteQuery(self, path , is_folder):
         if is_folder:
-            self.gs.removeRepository(path)
+            self.gs.RemoveFolder(path)
         else:
             self.gs.RemoveFile(path)
     def moveQuery(self, src , dest):
