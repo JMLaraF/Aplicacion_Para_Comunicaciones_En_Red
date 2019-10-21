@@ -73,9 +73,14 @@ class FileTransfer:
             elif(cmdArgs[0] == "move"):
                 self.moveQuery(cmdArgs[1] , cmdArgs[2])
             elif(cmdArgs[0] == "upload"):
-                threadFile = threading.Thread(target=self.ReciveFile , args=(cmdArgs[1] , cmdArgs[2] , int(cmdArgs[3]) , addr))
-                threadFile.setDaemon(True)
-                threadFile.start()
+                if(len(cmdArgs) == 4):
+                    threadFile = threading.Thread(target=self.ReciveFile , args=(cmdArgs[1] , cmdArgs[2] , int(cmdArgs[3]) , addr))
+                    threadFile.setDaemon(True)
+                    threadFile.start()
+                elif(len(cmdArgs) == 3):
+                    threadFile = threading.Thread(target=self.ReciveFile , args=(cmdArgs[1] , "" , int(cmdArgs[3]) , addr))
+                    threadFile.setDaemon(True)
+                    threadFile.start()
 
     #         if(cmdArgs[0] == "list"):
     #             folders = self.gs.listFolders(cmdArgs[1][1:])
@@ -115,7 +120,7 @@ class FileTransfer:
 
     def sendFile(self , filePath , MSG , ip):
         print("Inicio")
-        f = open(self.gs.dir + filePath , "rb")
+        f = open(filePath , "rb")
         FileInBytes = f.read()
         fileSize = f.tell()
         self.buffSize = 32768
