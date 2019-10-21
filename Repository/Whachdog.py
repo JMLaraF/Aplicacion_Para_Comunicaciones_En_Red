@@ -24,7 +24,7 @@ class Whatcher:
     def on_created(self, event):
         if(event.is_directory):
             print(f"Folder, {event.src_path} creado!")
-            MSG = "mkdir " + event.src_path[13:] + "/"
+            MSG = "mkdir " + event.src_path[14:] + "/"
             print(MSG)
             self.callServers(MSG)
             
@@ -32,7 +32,7 @@ class Whatcher:
 
     def on_deleted(self, event):
         print(f"Se elimino {event.src_path}!")
-        MSG = "delete " + event.src_path[13:] + "/ " + str(event.is_directory)
+        MSG = "delete " + event.src_path[14:] + "/ " + str(event.is_directory)
         print(MSG)
         self.callServers(MSG)
         #send message to delete file or folder
@@ -41,7 +41,7 @@ class Whatcher:
         if(event.src_path != "."):
             if not event.is_directory:
                 print(f"Se a Agregado/Modificado, {event.src_path}")
-                MSG = "upload " + os.path.basename(event.src_path) + " " + os.path.dirname(event.src_path)[13:] + " " + str(os.stat(event.src_path).st_size)
+                MSG = "upload " + os.path.basename(event.src_path) + " " + os.path.dirname(event.src_path)[14:] + "/ " + str(os.stat(event.src_path).st_size)
                 print(MSG)
                 for X in self.fileT.listOfServers:
                     th = threading.Thread(target=self.fileT.sendFile , args=(event.src_path, MSG , X,))
