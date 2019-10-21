@@ -44,7 +44,7 @@ class Whatcher:
                 MSG = "upload " + os.path.basename(event.src_path) + " " + os.path.dirname(event.src_path)[13:] + " " + str(os.stat(event.src_path).st_size)
                 print(MSG)
                 for X in self.fileT.listOfServers:
-                    th = threading.Thread(target=fileT.sendFile , args=(event.src_path, MSG , X,))
+                    th = threading.Thread(target=self.fileT.sendFile , args=(event.src_path, MSG , X,))
                     th.setDaemon(True)
                     th.start()
 
@@ -58,7 +58,7 @@ class Whatcher:
 
     def callServers(self , MSG):
         for X in self.fileT.listOfServers:
-                fileT.sendMessage(X,MSG)
+                self.fileT.sendMessage(X,MSG)
 
     def startWhatch(self):
         go_recursively = True
