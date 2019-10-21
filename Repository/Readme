@@ -1,0 +1,17 @@
+To run you need install Whachdog API with pip
+On ubuntu shell
+
+sudo apt-get install pip3
+pip3 install watchdog
+
+
+To run the program download all 3 Files and put in the same folder, run WhachDog.py this gonna create
+two folders "RECIVE" and "REPOSITORIO"
+all files that others send you will be there, and if you make a change in "REPOSITORIO"
+folder like create new file or folder it will happen
+in the other servers that are conected,
+
+To connect other server write add "<IP>" without quotes 
+Example add 192.168.43.233
+
+Maybe it change early (Or maybe not)
