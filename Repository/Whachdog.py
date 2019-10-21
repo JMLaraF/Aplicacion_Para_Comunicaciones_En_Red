@@ -7,13 +7,18 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from Server import FileTransfer
 
+is_coping = []
+on_copi = False
+
 class Whatcher:
+    
     def __init__(self):
         self.event_handler = FileSystemEventHandler()
         self.event_handler.on_created = self.on_created
         self.event_handler.on_deleted = self.on_deleted
         self.event_handler.on_modified = self.on_modified
         self.event_handler.on_moved = self.on_moved
+    #    self.event_handler.on_any_event = self.on_any_event
         self.my_observer = Observer()
 
         self.fileT = FileTransfer()
@@ -27,34 +32,49 @@ class Whatcher:
             MSG = "mkdir " + event.src_path[14:] + "/"
             print(MSG)
             self.callServers(MSG)
-            
             #Send message to create folder
 
     def on_deleted(self, event):
         print(f"Se elimino {event.src_path}!")
-        MSG = "delete " + event.src_path[14:] + "/ " + str(event.is_directory)
+        MSG = "delete " + event.src_path[14:] + " " + str(event.is_directory)
         print(MSG)
         self.callServers(MSG)
         #send message to delete file or folder
 
     def on_modified(self, event):
+    #    print("ENT")
         if(event.src_path != "."):
             if not event.is_directory:
-                print(f"Se a Agregado/Modificado, {event.src_path}")
-                MSG = "upload " + os.path.basename(event.src_path) + " " + os.path.dirname(event.src_path)[14:] + "/ " + str(os.stat(event.src_path).st_size)
-                print(MSG)
-                for X in self.fileT.listOfServers:
-                    th = threading.Thread(target=self.fileT.sendFile , args=(event.src_path, MSG , X,))
-                    th.setDaemon(True)
-                    th.start()
+                global is_coping
+                is_coping.append(1)
+                th = threading.Thread(target=self.decrement , args=(event,))
+                th.start()
+                
 
         #send message to upload file
 
+    def decrement(self,event):
+        global is_coping
+        time.sleep(1.001)
+        is_coping.pop()
+        if(len(is_coping) == 0):
+            print(f"Se a Agregado/Modificado, {event.src_path}")
+            MSG = "upload " + os.path.basename(event.src_path) + " " + os.path.dirname(event.src_path)[13:] + " " + str(os.stat(event.src_path).st_size)
+            print(MSG)
+            for X in self.fileT.listOfServers:
+                th = threading.Thread(target=self.fileT.sendFile , args=(event.src_path, MSG , X,))
+                th.setDaemon(True)
+                th.start()
+        sys.exit()
+
     def on_moved(self, event):
         print(f"Se movio {event.src_path} a {event.dest_path}")
-        MSG = "move " + event.src_path + " " + event.dest_path
+        MSG = "move " + event.src_path[14:] + " " + event.dest_path[14:]
         print(MSG)
         self.callServers(MSG)
+
+    # def on_any_event(self, event):
+        # print(event)
 
     def callServers(self , MSG):
         for X in self.fileT.listOfServers:

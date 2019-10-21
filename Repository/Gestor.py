@@ -83,8 +83,11 @@ class Gestor:                               #Gestor del repositorio
         return 0
 
     def move(self , src_path , dest_path):
-        return shutil.move(self.dir + src_path,self.dir + dest_path)
-
+        try:
+            shutil.move(self.dir + src_path,self.dir + dest_path)
+        except FileNotFoundError as e:
+            return -1
+        return 0
     def listFolders(self , path):
         #print(self.dir + path)
         elements = os.listdir(self.dir + path)

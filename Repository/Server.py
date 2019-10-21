@@ -58,6 +58,7 @@ class FileTransfer:
     def sendMessage(self, ip , MSG):
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
             s.sendto(MSG.encode('utf-8') , (ip,self.port))
+            s.close()
 
     def waitPetitions(self):
         sock =  socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -74,13 +75,14 @@ class FileTransfer:
                 self.moveQuery(cmdArgs[1] , cmdArgs[2])
             elif(cmdArgs[0] == "upload"):
                 if(len(cmdArgs) == 4):
-                    threadFile = threading.Thread(target=self.ReciveFile , args=(cmdArgs[1] , cmdArgs[2] , int(cmdArgs[3]) , addr))
+                    threadFile = threading.Thread(target=self.ReciveFile , args=(cmdArgs[1] , cmdArgs[2][1:] , int(cmdArgs[3]) , addr))
                     threadFile.setDaemon(True)
                     threadFile.start()
-                elif(len(cmdArgs) == 3):
-                    threadFile = threading.Thread(target=self.ReciveFile , args=(cmdArgs[1] , "" , int(cmdArgs[3]) , addr))
+                if(len(cmdArgs) == 3):
+                    threadFile = threading.Thread(target=self.ReciveFile , args=(cmdArgs[1] , "" , int(cmdArgs[2]) , addr))
                     threadFile.setDaemon(True)
                     threadFile.start()
+
 
     #         if(cmdArgs[0] == "list"):
     #             folders = self.gs.listFolders(cmdArgs[1][1:])
@@ -149,7 +151,9 @@ class FileTransfer:
                 steps = 0
         udp_sock.sendto(b'',addr)
         print("Llego %s" % filePath)
+        udp_sock.close()
         f.close()
+        return
 
     def ReciveFile(self , fileName , filePath , fileSize , addr):
         
@@ -182,7 +186,10 @@ class FileTransfer:
         f = open(self.dir + fileName, "wb+")
         f.write(newFile)
         f.close()
+        if(filePath != ""):
+            filePath += "/"
         self.gs.UploadFile(self.dir + fileName , filePath)
+        return
         
     def __del__(self):
         try:
