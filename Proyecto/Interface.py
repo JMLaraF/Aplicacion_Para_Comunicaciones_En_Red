@@ -5,9 +5,9 @@ import threading
 import os
 from fileSender import *
 
-
 class GUI:
     def __init__(self):
+
         self.win = tkinter.Tk()
         self.win.geometry("1200x600")
         Grid.columnconfigure(self.win , 3 , weight = 1)
@@ -26,18 +26,32 @@ class GUI:
         self.fileLabel.grid(row = 2 , column = 1 , sticky = "ew" , padx = 5 , pady = 10 , columnspan = 3)
         self.exploreBtn.grid(row = 2 , column = 0 , padx = 5)
         self.fileList.grid(row = 3 , column = 0 , columnspan = 4 , sticky = "wens")
+        
+        self.numberOfFiles = 0
+        self.listOfElemets = ""
+
+        if not os.path.isfile("./fileList"):
+            os.mknod("./fileList")
+        listF = open("./fileList" , "r")
+        line = listF.readline()
+        while line:
+            print(line)
+            self.fileList.insert(END , line[:-1])
+            self.numberOfFiles += 1
+            line = listF.readline()
+        listF.close()
+
 
         self.fSender = fileSender("192.168.0.4" , 34566)
-
-        # self.serv = Server()
-        # servListener = threading.Thread(target=self.serv.listener)
-        # servListener.setDaemon(True)
-        # servListener.start()
 
         self.fileToSend = ""
         self.listOfServers = ["10.114.45.152","10.114.45.181","10.114.45.210","10.114.45.23"]
 
         self.win.mainloop()
+
+        listF = open("./fileList" , "a+")
+        listF.write(self.listOfElemets)
+        listF.close()
 
     def popupFileWindow(self):
         self.fileToSend = filedialog.askopenfilename(initialdir = "./",title = "Elige un archivo para mandar al servidor",filetypes = (("txt files","*.txt"),("all files","*.*")))
@@ -57,6 +71,8 @@ class GUI:
         
         self.fSender.sendFile(self.fileToSend,self.listOfServers[0])
         self.fileList.insert(END , fName)
+        self.numberOfFiles += 1
+        self.listOfElemets += fName + "\n"
 
     def reciveFileCmd(self):
         s = socket.socket(socket.AF_INET , socket.SOCK_DGRAM)
