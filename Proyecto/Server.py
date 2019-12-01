@@ -17,9 +17,12 @@ class Server:
         sock.bind((self.ip , self.port))
         print("Is listening")
         while True:
-            data , addr = sock.recvfrom(100)
-            cmdArgs = data.decode('utf-8').split()
-            print(cmdArgs[0])
+            try:
+                data , addr = sock.recvfrom(100)
+                cmdArgs = data.decode('utf-8').split()
+                print(cmdArgs[0])
+            except KeyboardInterrupt as ex:
+                break
             if(cmdArgs[0] == "RF"):
                 fileInBytes = self.fSender.reciveFile(sock,addr)
                 if(cmdArgs[1] == '0'):
