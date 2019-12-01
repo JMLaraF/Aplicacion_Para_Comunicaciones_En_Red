@@ -4,7 +4,7 @@ import socket
 class fileSender:
 
     def __init__(self , ip , port):
-        self.bufferSize = 32768
+        self.bufferSize = 4194304
         self.port = port
         self.ip = ip
         try:
@@ -23,11 +23,12 @@ class fileSender:
         sock.connect((ip , self.port))
         x = 0
         while (self.bufferSize * x < fileSize):
-            block = fileInBytes[self.bufferSize * x : self.bufferSize * x + self.bufferSize - 1]
+            block = fileInBytes[self.bufferSize * x : self.bufferSize * (x+1)]
             sock.sendall(block)
             ack = sock.recv(self.bufferSize)
             x += 1
-            print("PK1")
+            if(x%5 == 0):
+                print("Enviando...")
         print("Envio completo")
     #    sock.shutdown(socket.SHUT_RDWR)
         sock.close()
@@ -43,11 +44,13 @@ class fileSender:
         sock.connect((ip , self.port))
         x = 0
         while (self.bufferSize * x < fileSize):
-            block = fileInBytes[self.bufferSize * x : self.bufferSize * x + self.bufferSize - 1]
+            block = fileInBytes[self.bufferSize * x : self.bufferSize * (x+1)]
             sock.sendall(block)
             ack = sock.recv(self.bufferSize)
             x += 1
-            print("PK1")
+            if(x%5 == 0):
+                print("Enviando...")
+    #        print("PK1")
         print("Envio completo")
     #    sock.shutdown(socket.SHUT_RDWR)
         sock.close()
@@ -61,14 +64,17 @@ class fileSender:
         conn , addr = sock.accept()
         print("Coneccion establecida")
         fileInBytes = b''
+        x = 0
         with conn:
             print("Recebiendo archivo")
             while True:
+                x += 1
                 try:
                     query = conn.recv(self.bufferSize)
                 except conn.timeout as tOut:
                     break
-                print("Recive")
+                if(x%5 == 0):
+                    print("Recibiendo...")
                 if not query:
                     break
                 fileInBytes += query
